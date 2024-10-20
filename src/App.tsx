@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App : React.FC = () => {
+  const [goalList, setGoalList] = useState<string[]>(["Achieve mastery in Puppeteer765"]);
+  const [newGoal, setNewGoal] = useState<string>("");
+
+  const handleChangeGoalInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewGoal(event.target.value);
+  }
+
+  const handleRemoveFirstItem = (key: number) => {
+    if(key === 0) {
+      setGoalList([...goalList].slice(1));
+    }
+  }
+
+  const handleAddNewGoal = () => {
+    setGoalList([newGoal, ...goalList]);
+    setNewGoal("");
+  }
 
   return (
     <div  data-testId="MainApp">
       {/*Don't remove the data-testId as it's required for the system to detect that the app is live */}
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h2>New Goal</h2>
+        <input data-testId="GoalInput" type="text" value={newGoal} onChange={handleChangeGoalInput} />
+        <button data-testId="Add Goal" onClick={handleAddNewGoal}>Add Goal</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div>
+        {
+          goalList.map((goal, key) => {
+            return (
+              <div data-testId={goal} key={key} onClick={() => handleRemoveFirstItem(key)}>
+                {goal}
+              </div>
+            )
+          })
+        }
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   )
 }
