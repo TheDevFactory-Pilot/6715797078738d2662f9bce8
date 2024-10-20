@@ -1,0 +1,49 @@
+#backend compose file
+version: '3.8'
+services:
+
+  mongocandidate:
+    image: 'mongo'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  backend:
+    image: '426691418260.dkr.ecr.us-east-1.amazonaws.com/candidate-backend'
+    ports:
+      - 90:80 
+    #build: if we need to dockerize instances first
+      #context: ./backend
+      #dockerfile: Dockerfile
+    depends_on:
+      - mongocandidate #name of service
+    environment:
+      - DB_URL=mongocandidate
+
+  #pull image from ECR and simply runs api calls imperatively 
+  candidateapp:
+  #IF Testing setup, uncomment this
+    build:
+      context: .
+    ports:
+      - 3002:8080
+    depends_on: 
+      - backend
+
+  evaluationworker:
+    image: 426691418260.dkr.ecr.us-east-1.amazonaws.com/deployment_testing_frontend
+    depends_on:
+      - candidateapp
+    volumes:
+      - ./src:/app/src
+    environment: #changes
+      - projectID=6715797078738d2662f9bce8
+      - templateId=66b53dfc3d80ef2030bcedaf
+      - skill=react
+      - hiringCampaignId=671578c58ad7b50fee048786
+      - sub=d860873d-967c-4fb1-9de1-27568bcb92ef
+      - trackID=6715797078738d2662f9bce9
+  
+
+
+
